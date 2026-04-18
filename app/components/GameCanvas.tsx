@@ -303,9 +303,9 @@ function drawStartScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#888';
   ctx.font = '17px Arial';
   const lines = [
-    'Düşen kalpleri yakala,',
-    'kaçırma! Hız zamanla',
-    'artacak — iyi şanslar ♥',
+    'Şimdi sana kalp atcam',
+    'Hepsini tut tamammi',
+    'Seni cok seviyom ♥',
   ];
   lines.forEach((l, i) => ctx.fillText(l, W / 2, H / 2 - 72 + i * 28));
 
