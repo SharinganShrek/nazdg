@@ -58,17 +58,10 @@ function makeState(): GS {
 
 /* ═══════════════════════ drawing helpers ═══════════════════════ */
 
-function drawGrid(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, W, H);
-  ctx.strokeStyle = '#ffd6d6';
-  ctx.lineWidth = 0.8;
-  for (let x = 0; x <= W; x += GRID) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-  }
-  for (let y = 0; y <= H; y += GRID) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-  }
+// Canvas is transparent — the CSS grid background shows through.
+// We only need to clear each frame so previous drawings don't linger.
+function clearCanvas(ctx: CanvasRenderingContext2D) {
+  ctx.clearRect(0, 0, W, H);
 }
 
 function heartPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
@@ -279,7 +272,7 @@ function drawHint(ctx: CanvasRenderingContext2D) {
 }
 
 function drawStartScreen(ctx: CanvasRenderingContext2D) {
-  drawGrid(ctx);
+  clearCanvas(ctx);
 
   // decorative hearts
   const positions = [
@@ -330,7 +323,7 @@ function drawStartScreen(ctx: CanvasRenderingContext2D) {
 }
 
 function drawGameOver(ctx: CanvasRenderingContext2D, score: number) {
-  drawGrid(ctx);
+  clearCanvas(ctx);
   ctx.save();
   ctx.fillStyle = 'rgba(255,255,255,0.90)';
   ctx.fillRect(0, 0, W, H);
@@ -475,7 +468,7 @@ export default function GameCanvas() {
     });
 
     /* ── render ── */
-    drawGrid(ctx);
+    clearCanvas(ctx);
     drawBoy(ctx, boyImgRef.current, s.boyX, BOY_Y);
     drawGirl(ctx, girlImgRef.current, s.girlX, GIRL_Y);
     s.hearts.forEach(h => drawHeart(ctx, h.x, h.y, HEART_R));
@@ -557,38 +550,37 @@ export default function GameCanvas() {
   /* ─── render wrapper ─── */
   return (
     <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100dvh',
-      background: '#ebebeb',
-      padding: '12px 0',
+      display:         'flex',
+      alignItems:      'center',
+      justifyContent:  'center',
+      minHeight:       '100dvh',
+      /* CSS grid paper — fills the whole screen behind the canvas */
+      backgroundColor: '#fff',
+      backgroundImage: [
+        'linear-gradient(rgba(255,214,214,0.75) 0.8px, transparent 0.8px)',
+        'linear-gradient(90deg, rgba(255,214,214,0.75) 0.8px, transparent 0.8px)',
+      ].join(', '),
+      backgroundSize: '20px 20px',
     }}>
-      {/* phone-frame shell visible on desktop */}
-      <div style={{
-        position:     'relative',
-        borderRadius: 44,
-        border:       '10px solid #1a1a2e',
-        boxShadow:    '0 0 0 2px #333, 0 28px 70px rgba(0,0,0,0.38)',
-        overflow:     'hidden',
-        /* scale down so it always fits the viewport */
-        width:   'min(390px, 96vw)',
-        aspectRatio: '390 / 844',
-      }}>
-        <canvas
-          ref={canvasRef}
-          width={W}
-          height={H}
-          style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none' }}
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseUp}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        />
-      </div>
+      {/* canvas is transparent — CSS grid shows through */}
+      <canvas
+        ref={canvasRef}
+        width={W}
+        height={H}
+        style={{
+          display:     'block',
+          height:      '100dvh',
+          width:       'auto',
+          touchAction: 'none',
+        }}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      />
     </div>
   );
 }
