@@ -23,11 +23,11 @@ const GIRL_SPEED = 310;    // px/s
 const HEART_R = 16;
 const MAX_MISSED = 5;
 
-// Difficulty (ramps over 30 s, then continues slowly)
-const SPAWN_START = 1200;  // ms between drops
-const SPAWN_MIN   = 280;
-const FALL_START  = 180;   // px/s
-const FALL_MAX    = 520;
+// Difficulty (ramps over 20 s, then keeps climbing)
+const SPAWN_START = 900;   // ms between drops
+const SPAWN_MIN   = 180;
+const FALL_START  = 250;   // px/s
+const FALL_MAX    = 680;
 
 /* ─────────────────────────── types ─────────────────────────── */
 interface HeartObj { id: number; x: number; y: number; speed: number }
@@ -415,12 +415,12 @@ export default function GameCanvas() {
     s.lastTime = ts;
     s.elapsed += dt;
 
-    /* ── difficulty: quadratic ramp over 30 s, then slow creep beyond ── */
-    const t = Math.min(s.elapsed / 30, 1);
+    /* ── difficulty: quadratic ramp over 20 s, then keeps climbing ── */
+    const t = Math.min(s.elapsed / 20, 1);
     const curve = t * t;                    // ease-in² → fast early growth
     const spawnInterval = SPAWN_START - (SPAWN_START - SPAWN_MIN) * curve;
     const fallSpeed     = FALL_START  + (FALL_MAX  - FALL_START)  * curve
-                        + s.elapsed * 1.2; // +1.2 px/s per second after 30 s
+                        + s.elapsed * 3;  // +3 px/s every second after 20 s
 
     /* ── boy movement ── */
     const boyDiff = s.boyTargetX - s.boyX;
